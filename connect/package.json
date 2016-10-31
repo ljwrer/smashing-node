@@ -1,0 +1,12 @@
+{
+  "name": "http-static",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "compression": "^1.6.2",
+    "connect": "^3.5.0",
+    "morgan": "^1.7.0",
+    "serve-static": "^1.11.1"
+  }
+}
