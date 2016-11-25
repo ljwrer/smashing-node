@@ -6,11 +6,23 @@
     <link rel="stylesheet" href="style/foundation.css">
 </head>
 <body>
-<form action="/login" method="post" class="row">
-    <fieldset class="fieldset">
+<form  action="/login" method="post" class="row">
+    <fieldset>
         <legend>Please log in</legend>
-        <label>user:<input name="name"></label>
-        <label>password:<input type="password" name="password"></label>
+        <div class="row">
+            <div class="medium-6 columns">
+                <label>user:
+                    <input type="text" name="name">
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="medium-6 columns">
+                <label>password:
+                    <input type="password" name="password">
+                </label>
+            </div>
+        </div>
         <button class="button bounce-in">submit</button>
     </fieldset>
 </form>
