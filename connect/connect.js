@@ -55,31 +55,31 @@ app.use(function c_d(req, res, next) {
     }
 });
 app.use(function d_d(req, res, next) {
-    if ('POST' === req.method && '/upload' === req.url){
-        const busboy = new Busboy({ headers: req.headers });
-        busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+    if ('POST' === req.method && '/upload' === req.url) {
+        const busboy = new Busboy({headers: req.headers});
+        busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
             var saveTo = path.join('./uploads', filename);
             file.pipe(fs.createWriteStream(saveTo));
             // var temp=fs.createWriteStream(`./uploads/${filename}`);
             console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
-            file.on('data', function(data) {
+            file.on('data', function (data) {
                 // temp.write(data);
                 console.log('File [' + fieldname + '] got ' + data.length + ' bytes');
             });
-            file.on('end', function() {
+            file.on('end', function () {
                 console.log('File [' + fieldname + '] Finished');
             });
         });
-        busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
+        busboy.on('field', function (fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
             console.log('Field [' + fieldname + ']: value: ' + inspect(val));
         });
-        busboy.on('finish', function() {
+        busboy.on('finish', function () {
             console.log('Done parsing form!');
-            res.writeHead(303, { Connection: 'close', Location: '/' });
+            res.writeHead(303, {Connection: 'close', Location: '/'});
             res.end();
         });
         req.pipe(busboy);
-    }else {
+    } else {
         next()
     }
 });

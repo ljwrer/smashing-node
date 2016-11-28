@@ -1,11 +1,11 @@
 /**
  * Created by Ray on 2016/9/19.
  */
-const net=require('net');
+const net = require('net');
 // net.connect(3000,'localhost',function () {
 //     console.log('connect')
 // });
-const client=net.connect(6667,'irc.freenode.net');
+const client = net.connect(6667, 'irc.freenode.net');
 client.setEncoding('utf-8');
 client.on('connect', function () {
     console.log('connect');

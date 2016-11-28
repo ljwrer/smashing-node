@@ -5,9 +5,9 @@ process.stdin.setEncoding('utf8');
 
 process.stdin.on('readable', () => {
     var chunk = process.stdin.read();
-    if (chunk !== null&&chunk.length>0) {
+    if (chunk !== null && chunk.length > 0) {
         process.stdout.write(`data: ${chunk}`);
-    }else {
+    } else {
         process.stdin.end();
     }
 });

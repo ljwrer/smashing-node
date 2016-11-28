@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style/foundation.css">
+</head>
+<body>
+<button id="btn">click</button>
+<script>
+    var btn = document.querySelector("#btn");
+    function onload () {
+        alert('got response: ' + this.responseText)
+    }
+    btn.addEventListener('click',function () {
+        var xhr = new XMLHttpRequest()
+        xhr.onload = onload
+        xhr.open('post', '/resource', true)
+        xhr.setRequestHeader('X-HTTP-Method-Override', 'PUT')
+        xhr.send()
+    })
+</script>
+</body>
+</html>

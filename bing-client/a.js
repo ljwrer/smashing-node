@@ -1,7 +1,7 @@
 /**
  * Created by Ray on 2016/10/28.
  */
-const program=require('commander');
+const program = require('commander');
 
 program
     .version('0.0.1')
