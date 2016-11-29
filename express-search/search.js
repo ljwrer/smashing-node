@@ -32,12 +32,6 @@ const foo=function () {
     return axios.get('http://localhost:3001/users/detail')
 };
 router.get('/detail',function (req,res,next) {
-    // const start=Date.now();
-    // axios.all([foo(),foo()]).then(axios.spread(function () {
-    //     res.json({
-    //         time:Date.now()-start
-    //     })
-    // })).catch(err=>next(err))
     axios.get('http://localhost:3001/users/detail').then(data=>{
         res.json(data.data)
     }).catch(err=>next(err))
