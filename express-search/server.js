@@ -7,18 +7,10 @@ const app = express();
 const search = require('./search');
 app.use('/search',search);
 app.use(express.static('public'));
-
+console.log(process.env.NODE_ENV);
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname, '/views'));
-
 app.get('/', function(req, res){
     res.render('index');
 });
-app.get('/search',function (req,res) {
-    console.log(req.query)
-    search(req.query).then(function (data) {
-        res.json(data)
-    })
-});
-
 app.listen(3000);

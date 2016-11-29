@@ -16,16 +16,30 @@ const api = function api_d({q,count=10}) {
     })
 };
 router.get('/',function (req,res,next) {
-
+    const start=Date.now();
     api(req.query).then(function (data) {
-        var result=[];
+        let result=[];
+        let amount=0;
         if(data.data&&data.data.webPages){
-            result = data.data.webPages;
+            const web=data.data.webPages;
+            result = web.value;
+            amount = web.totalEstimatedMatches;
         }
-        res.render('result',{result});
-    }).catch(function (err) {
-        console.log(err);
-        res.end("not found")
-    })
+        res.render('result',{result,time:Date.now()-start,amount});
+    }).catch(err=>next(err))
 });
+const foo=function () {
+    return axios.get('http://localhost:3001/users/detail')
+};
+router.get('/detail',function (req,res,next) {
+    // const start=Date.now();
+    // axios.all([foo(),foo()]).then(axios.spread(function () {
+    //     res.json({
+    //         time:Date.now()-start
+    //     })
+    // })).catch(err=>next(err))
+    axios.get('http://localhost:3001/users/detail').then(data=>{
+        res.json(data.data)
+    }).catch(err=>next(err))
+})
 module.exports=router;

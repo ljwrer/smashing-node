@@ -10,14 +10,14 @@
 </head>
 <body>
 <div class="ui text container">
-    <form class="ui form">
+    <form class="ui form" action="/search" enctype="application/x-www-form-urlencoded">
         <div class="field">
             <label>query</label>
-            <input type="text" name="name" placeholder="query key">
+            <input type="text" name="q" placeholder="query key">
         </div>
         <div class="field">
             <label>amount</label>
-            <input type="text" name="amount" placeholder="amount">
+            <input type="text" name="count" placeholder="count" value="10">
         </div>
         <button class="ui button primary" type="submit">Search</button>
     </form>

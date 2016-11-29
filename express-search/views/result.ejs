@@ -6,15 +6,43 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <link href="/style/semantic.css" rel="stylesheet">
 </head>
 <body>
-<h3 class="ui center aligned header">result</h3>
 <div class="ui text container">
+    <h2 class="ui center aligned icon header">
+        <i class="circular search icon"></i>
+        <%= amount %> result in <%= time %> milliseconds
+    </h2>
     <div class="ui segments">
-        <% if(result.length){
+        <% if(result.length){ %>
+        <% result.map(function (item){ %>
+        <div class="ui items">
+            <div class="item">
+                <div class="image">
+                    <img src="<%= item.thumbnailUrl %>">
+                </div>
+                <div class="content">
+                    <a class="header" href="<%= item.url %>"><%= item.name %></a>
+                    <div class="meta">
+                        <a href="<%= item.url %>"><%= item.displayUrl %></a>
+                    </div>
+                    <div class="description">
+                        <p><%= item.snippet %></p>
+                    </div>
+                    <div class="extra date">
+                        <%= item.dateLastCrawled %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% }) %>
+        <% } %>
 
-        } %>
     </div>
 </div>
+
+
+
 </body>
 </html>
