@@ -3,17 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link href="/foundation.css" rel="stylesheet">
+    <style>
+        html,
+        body {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: deepskyblue;
+        }
+
+        .point {
+            position: absolute;
+            /*width: 50px;*/
+            /*height: 50px;*/
+            transform: translate(-50%, -50%);
+            /*border-radius: 50%;*/
+            border: 1px solid;
+        }
+    </style>
 </head>
 <body>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/node_modules/randomcolor/randomColor.js"></script>
+<script src="/node_modules/lodash/lodash.js"></script>
+<script src="/node_modules/jquery/dist/jquery.js"></script>
 <script>
-    var socket=io();
-    socket.on('connect',function (data) {
-        console.log(data)
+    const POSITION = 'position';
+    const REMOVE = 'remove';
+    const socket = io();
+    const $cache = {};
+    const $myPoint = $(`<span class="point"></span>`);
+    const $body = $('body');
+    $body.append($myPoint);
+    const drawPoint = function drawPoint_d({pageX, pageY, id}) {
+        let $point;
+        if (!Object.prototype.hasOwnProperty.call($cache, id)) {
+            $point = $(`<span class="point point-${id}"></span>`);
+            $body.append($point);
+            $cache[id] = $point;
+        } else {
+            $point = $cache[id]
+        }
+        const width = _.random(10, 100);
+        $point.css({
+            left: pageX,
+            top: pageY,
+            backgroundColor: randomColor(),
+            borderColor: randomColor(),
+            width: width,
+            height: width,
+            borderRadius: `${_.random(0, 50)}%`
+        })
+    };
+    const deletePoint = function deletePoint_d(id) {
+        if ($cache[id]) {
+            $cache[id].remove();
+            delete $cache.id
+        }
+    };
+    $body.mousemove(({pageX, pageY}) => {
+        const myWidth = _.random(10, 100);
+        $myPoint.css({
+            left: pageX,
+            top: pageY,
+            backgroundColor: randomColor(),
+            borderColor: randomColor(),
+            width: myWidth,
+            height: myWidth,
+            borderRadius: `${_.random(0, 50)}%`
+        });
+        socket.emit('point', {pageX, pageY})
     });
-    socket.emit('hello',{
-        client:Date.now()
-    });
+    socket.on(POSITION, drawPoint);
+    socket.on(REMOVE, deletePoint);
 </script>
 </body>
 </html>
