@@ -1,0 +1,26 @@
+<% include ../partials/header.ejs %>
+<div>
+    <form>
+        <fieldset>
+            <p>
+                <label>first</label>
+                <input type="text" name="user[first]">
+            </p>
+            <p>
+                <label>last</label>
+                <input type="text" name="user[last]">
+            </p>
+            <p>
+                <label>email</label>
+                <input type="email" name="user[email]">
+            </p>
+            <p>
+                <label>password</label>
+                <input type="password" name="user[password]">
+            </p>
+            <button>submit</button>
+        </fieldset>
+    </form>
+    <a href="/">go back</a>
+</div>
+<% include ../partials/footer.ejs %>
