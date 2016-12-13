@@ -222,6 +222,14 @@ kareem@1.1.3:
   version "1.1.3"
   resolved "http://registry.npm.taobao.org/kareem/download/kareem-1.1.3.tgz#0877610d8879c38da62d1dbafde4e17f2692f041"
 
+lodash.foreach@^4.1.0:
+  version "4.5.0"
+  resolved "http://registry.npm.taobao.org/lodash.foreach/download/lodash.foreach-4.5.0.tgz#1a6a35eace401280c7f06dddec35165ab27e3e53"
+
+lodash.get@^4.0.2:
+  version "4.4.2"
+  resolved "http://registry.npm.taobao.org/lodash.get/download/lodash.get-4.4.2.tgz#2d177f652fa31e939b4438d5341499dfa3825e99"
+
 lodash@^4.14.0:
   version "4.17.2"
   resolved "http://registry.npm.taobao.org/lodash/download/lodash-4.17.2.tgz#34a3055babe04ce42467b607d700072c7ff6bf42"
@@ -281,6 +289,13 @@ mongodb@^2.2.12:
     es6-promise "3.2.1"
     mongodb-core "2.0.14"
     readable-stream "2.1.5"
+
+mongoose-unique-validator@^1.0.3:
+  version "1.0.3"
+  resolved "http://registry.npm.taobao.org/mongoose-unique-validator/download/mongoose-unique-validator-1.0.3.tgz#a2e97da44a85f31f9d6381655ad0d4707b562bd6"
+  dependencies:
+    lodash.foreach "^4.1.0"
+    lodash.get "^4.0.2"
 
 mongoose@^4.7.1:
   version "4.7.1"

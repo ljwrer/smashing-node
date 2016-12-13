@@ -2,7 +2,8 @@
  * Created by Ray on 2016/12/2.
  */
 const express = require('express');
-const mongodb = require('mongodb');
+const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 const assert = require('assert');
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -30,67 +31,58 @@ app.get('/login', (req, res) => {
 app.get('/sign', (req, res) => {
     res.render('pages/sign')
 });
-const MongoClient = mongodb.MongoClient;
-// Connection URL
-const url = 'mongodb://localhost:27017/myproject';
-// Use connect method to connect to the Server
-MongoClient.connect(url, function(err, db) {
-    assert.equal(null, err);
-    console.log("Connected correctly to server");
-    insertDocuments(db, function() {
-        updateDocument(db, function() {
-            db.close();
-        });
-    });
+app.post('/sign', (req, res ,next) => {
+    const {email, first, last, password} = req.body.user;
+    const user = new User({email, first, last, password});
+    user.save()
+        .then(()=>{res.redirect('/')})
+        .catch(err=>{
+            const errors = err.errors;
+            if(errors){
+                const message=[];
+                Object.keys(errors).forEach(key=>{
+                    const error = errors[key];
+                    message.push(error.message)
+                });
+                err.message = message.join(' ');
+            }
+            console.log(err.message)
+            next(err)
+        })
 });
-const insertDocuments = function(db, callback) {
-    // Get the documents collection
-    const collection = db.collection('documents');
-    // Insert some documents
-    collection.insertMany([
-        {a : 1}, {a : 2}, {a : 3}
-    ], function(err, result) {
-        assert.equal(err, null);
-        assert.equal(3, result.result.n);
-        assert.equal(3, result.ops.length);
-        console.log("Inserted 3 documents into the document collection");
-        callback(result);
-    });
-};
-const updateDocument = function(db, callback) {
-    // Get the documents collection
-    const collection = db.collection('documents');
-    // Update document where a is 2, set b equal to 1
-    collection.updateOne({ a : 2 }
-        , { $set: { b : 1 } }, function(err, result) {
-            assert.equal(err, null);
-            assert.equal(1, result.result.n);
-            console.log("Updated the document with the field a equal to 2");
-            callback(result);
-        });
-};
-const deleteDocument = function(db, callback) {
-    // Get the documents collection
-    const collection = db.collection('documents');
-    // Insert some documents
-    collection.deleteOne({ a : 3 }, function(err, result) {
-        assert.equal(err, null);
-        assert.equal(1, result.result.n);
-        console.log("Removed the document with the field a equal to 3");
-        callback(result);
-    });
-};
-const findDocuments = function(db, callback) {
-    // Get the documents collection
-    const collection = db.collection('documents');
-    // Find some documents
-    collection.find({}).toArray(function(err, docs) {
-        assert.equal(err, null);
-        assert.equal(2, docs.length);
-        console.log("Found the following records");
-        console.dir(docs);
-        callback(docs);
-    });
-};
-
+app.use(function (err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = err;
+    // render the error page
+    res.status(err.status || 500);
+    res.render('common/error');
+});
+mongoose.connect('mongodb://localhost/smashing');
+const userSchema = mongoose.Schema({
+    first: {
+        type: String,
+        require: true
+    },
+    last: {
+        type: String,
+        require: true
+    },
+    email: {
+        type: String,
+        validate: {
+            validator:/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/,
+            message:"无效的邮箱"
+        },
+        unique: [true,"重复的邮箱"],
+        index:true
+    },
+    password: {
+        type: String,
+        minlength: [6,'密码太短']
+    }
+});
+const uniqueValidator = require('mongoose-unique-validator');
+userSchema.plugin(uniqueValidator);
+const User = mongoose.model('User', userSchema);
 app.listen(3000);
