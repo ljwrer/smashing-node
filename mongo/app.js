@@ -10,45 +10,75 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const logger = require('morgan');
+const qs = require('querystring');
 const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({
-    name: 'my session',
+    name: 'token',
     secret: 'my secret session key',
     resave: false,
     saveUninitialized: false,
 }));
 app.use(logger('dev'));
 app.get('/', (req, res) => {
-    res.render('pages/index', {auth: false})
+    const logged_in = req.session.logged_in;
+    res.locals.logged_in = logged_in;
+    console.log(logged_in);
+    if (logged_in) {
+        User.findById(logged_in).then(doc => {
+            res.locals.fullName = doc.fullName;
+            res.render('pages/index')
+        })
+    } else {
+        res.render('pages/index')
+    }
+
 });
 app.get('/login', (req, res) => {
+    res.locals.email = req.query.email;
     res.render('pages/login')
+});
+app.post('/login', (req, res, next) => {
+    User.findOne(req.body.user).then(doc => {
+        if(doc){
+            req.session.logged_in = doc._id;
+            res.redirect('/');
+        }else {
+            throw new Error('邮箱或密码错误')
+        }
+    }).catch(next)
 });
 app.get('/sign', (req, res) => {
     res.render('pages/sign')
 });
-app.post('/sign', (req, res ,next) => {
-    const {email, first, last, password} = req.body.user;
-    const user = new User({email, first, last, password});
+app.post('/sign', (req, res, next) => {
+    const user = new User(req.body.user);
     user.save()
-        .then(()=>{res.redirect('/')})
-        .catch(err=>{
+        .then((doc) => {
+            const email = doc.email;
+            const query = qs.stringify({email});
+            res.redirect(`/login?${query}`);
+        })
+        .catch(err => {
             const errors = err.errors;
-            if(errors){
-                const message=[];
-                Object.keys(errors).forEach(key=>{
+            if (errors) {
+                const message = [];
+                Object.keys(errors).forEach(key => {
                     const error = errors[key];
                     message.push(error.message)
                 });
                 err.message = message.join(' ');
             }
-            console.log(err.message)
+            console.log(err.message);
             next(err)
         })
+});
+app.get('/logout',(req,res)=>{
+    req.session.logged_in = null;
+    res.redirect('/');
 });
 app.use(function (err, req, res, next) {
     // set locals, only providing error in development
@@ -71,18 +101,23 @@ const userSchema = mongoose.Schema({
     email: {
         type: String,
         validate: {
-            validator:/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/,
-            message:"无效的邮箱"
+            validator: /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/,
+            message: "无效的邮箱"
         },
-        unique: [true,"重复的邮箱"],
-        index:true
+        unique: true,
+        index: true
     },
     password: {
         type: String,
-        minlength: [6,'密码太短']
+        minlength: [6, '密码太短']
     }
 });
 const uniqueValidator = require('mongoose-unique-validator');
-userSchema.plugin(uniqueValidator);
+userSchema.plugin(uniqueValidator, {
+    message: '{PATH}已存在'
+});
+userSchema.virtual('fullName').get(function () {
+    return `${this.first} ${this.last}`
+});
 const User = mongoose.model('User', userSchema);
 app.listen(3000);

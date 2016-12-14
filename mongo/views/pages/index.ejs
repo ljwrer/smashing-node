@@ -1,7 +1,7 @@
 <% include ../partials/header.ejs %>
 <div>
-    <% if(auth){ %>
-    <p>Welcome back <%= me.name %></p>
+    <% if(logged_in){ %>
+    <p>Welcome back <%= fullName %></p>
     <a href="/logout">logout</a>
     <% }else { %>
     <p>Welcome new visitor!</p>
