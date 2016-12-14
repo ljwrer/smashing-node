@@ -24,10 +24,13 @@ app.use(session({
 }));
 app.use(logger('dev'));
 app.get('/', (req, res) => {
-    Book.find().select('name reader').then((books) => {
-        res.locals.books = books ? books : [];
-        res.render('pages/index', {title: 'home'});
-    })
+    Book.find()
+        .populate('reader.name')
+        .then((books) => {
+            console.log(books[0])
+            res.locals.books = books ? books : [];
+            res.render('pages/index', {title: 'home'});
+        })
 });
 app.get('/add', (req, res) => {
     res.render('pages/add', {
@@ -36,12 +39,14 @@ app.get('/add', (req, res) => {
 });
 app.post('/add', (req, res, next) => {
     const {book, person} = req.body.book;
-    Book.findOneAndUpdate({name: book}, {$addToSet: {reader: person}}, {upsert: true})
-        .then(() => Person.findOneAndUpdate({name: person}, {$addToSet: {books: book}}, {upsert: true}))
-        .then(() => {
-            res.redirect('/')
-        })
-        .catch(next);
+    Promise.all([
+        Book.findOneAndUpdate({name: book}, {}, {upsert: true, new: true}),
+        Person.findOneAndUpdate({name: person}, {}, {upsert: true, new: true})
+    ]).then(([bookDoc, PersonDoc]) => Promise.all([
+            bookDoc.update({$addToSet: {reader: PersonDoc._id}}),
+            PersonDoc.update({$addToSet: {books: bookDoc._id}})
+        ])
+    ).then(() => res.redirect('/'))
 });
 app.get('/book', (req, res) => {
     res.render('pages/book', {
@@ -49,7 +54,10 @@ app.get('/book', (req, res) => {
     })
 });
 app.get('./bookResult', (req, res, next) => {
-    Book.find()
+    const name = req.query.book;
+    Book.find({name})
+        .select('reader')
+        .then(result => console.log(result))
 })
 app.get('/person', (req, res) => {
     res.render('pages/person', {
