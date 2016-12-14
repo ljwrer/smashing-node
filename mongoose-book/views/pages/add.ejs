@@ -1,0 +1,19 @@
+<% include ../partials/header.ejs %>
+<div>
+    <form enctype="application/x-www-form-urlencoded" method="post" action="/add">
+        <fieldset>
+            <p>
+                <label>book</label>
+                <input name="book[book]"/>
+            </p>
+            <p>
+                <label>reader</label>
+                <input name="book[person]">
+            </p>
+            <button>新增</button>
+        </fieldset>
+    </form>
+    <a href="/">go back</a>
+</div>
+<% include ../partials/footer.ejs %>
+

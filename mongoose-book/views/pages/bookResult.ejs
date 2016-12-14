@@ -1,0 +1,13 @@
+<% include ../partials/header.ejs %>
+<div>
+    <hr>
+    <% reader.forEach(function (book) { %>
+    <dl>
+        <dt><%= book %></dt>
+        <% book.reader.forEach(function (person) { %>
+        <dd><%= person %></dd>
+        <% }) %>
+    </dl>
+    <% }) %>
+</div>
+<% include ../partials/footer.ejs %>

@@ -23,19 +23,23 @@ app.use(session({
     saveUninitialized: false,
 }));
 app.use(logger('dev'));
-app.get('/', (req, res) => {
+app.use((req, res, next) => {
     const logged_in = req.session.logged_in;
     res.locals.logged_in = logged_in;
-    console.log(logged_in);
     if (logged_in) {
+        const user =User.findById(logged_in);
+        console.log(user);
         User.findById(logged_in).then(doc => {
             res.locals.fullName = doc.fullName;
-            res.render('pages/index')
-        })
+            next()
+        }).catch(next)
     } else {
-        res.render('pages/index')
+        res.locals.logged_in = null;
+        next()
     }
-
+});
+app.get('/', (req, res) => {
+    res.render('pages/index')
 });
 app.get('/login', (req, res) => {
     res.locals.email = req.query.email;
@@ -43,10 +47,10 @@ app.get('/login', (req, res) => {
 });
 app.post('/login', (req, res, next) => {
     User.findOne(req.body.user).then(doc => {
-        if(doc){
+        if (doc) {
             req.session.logged_in = doc._id;
             res.redirect('/');
-        }else {
+        } else {
             throw new Error('邮箱或密码错误')
         }
     }).catch(next)
@@ -76,7 +80,7 @@ app.post('/sign', (req, res, next) => {
             next(err)
         })
 });
-app.get('/logout',(req,res)=>{
+app.get('/logout', (req, res) => {
     req.session.logged_in = null;
     res.redirect('/');
 });
