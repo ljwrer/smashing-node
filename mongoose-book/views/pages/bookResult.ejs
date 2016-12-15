@@ -1,13 +1,15 @@
 <% include ../partials/header.ejs %>
 <div>
     <hr>
-    <% reader.forEach(function (book) { %>
-    <dl>
-        <dt><%= book %></dt>
-        <% book.reader.forEach(function (person) { %>
-        <dd><%= person %></dd>
+    <h2>书名:<%= name %></h2>
+    <% if(reader.length > 0){ %>
+    <ul>
+        <% reader.forEach(function (person) { %>
+        <li><a href="/personResult?person=<%= encodeURIComponent(person.name) %>"><%= person.name %></a></li>
         <% }) %>
-    </dl>
-    <% }) %>
+    </ul>
+    <% }else { %>
+    <h5>没有找到读者</h5>
+    <% }%>
 </div>
 <% include ../partials/footer.ejs %>

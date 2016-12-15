@@ -5,7 +5,7 @@
         <dl>
             <dt><%= book.name %></dt>
             <% book.reader.forEach(function (person) { %>
-            <dd><%= person %></dd>
+            <dd><%= person.name %></dd>
             <% }) %>
         </dl>
     <% }) %>

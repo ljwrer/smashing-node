@@ -25,12 +25,19 @@ app.use(session({
 app.use(logger('dev'));
 app.get('/', (req, res) => {
     Book.find()
-        .populate('reader.name')
-        .then((books) => {
-            console.log(books[0])
+        .populate({
+            path: 'reader',
+            select: {
+                name: 1,
+                _id: 0
+            }
+        })
+        .then(books => {
+            console.log(books);
             res.locals.books = books ? books : [];
             res.render('pages/index', {title: 'home'});
         })
+
 });
 app.get('/add', (req, res) => {
     res.render('pages/add', {
@@ -47,23 +54,38 @@ app.post('/add', (req, res, next) => {
             PersonDoc.update({$addToSet: {books: bookDoc._id}})
         ])
     ).then(() => res.redirect('/'))
+        .catch(next)
 });
 app.get('/book', (req, res) => {
     res.render('pages/book', {
         title: '根据书名查找'
     })
 });
-app.get('./bookResult', (req, res, next) => {
+app.get('/bookResult', (req, res, next) => {
     const name = req.query.book;
-    Book.find({name})
-        .select('reader')
-        .then(result => console.log(result))
-})
+    res.locals.title = '根据书名查找结果';
+    res.locals.name = name;
+    res.locals.reader = [];
+    Book.findOne({name}, {__v: 0, _id: 0})
+        .populate('reader', {name: 1, _id: 0})
+        .then(result => res.render('pages/bookResult', result))
+        .catch(next)
+});
 app.get('/person', (req, res) => {
     res.render('pages/person', {
         title: '根据人名查找'
     })
 });
+app.get('/personResult', (req, res, next) => {
+    const name = req.query.person;
+    res.locals.title = '根据人名查找结果';
+    res.locals.name = name;
+    res.locals.books = [];
+    Person.findOne({name}, {__v: 0, _id: 0})
+        .populate('books', {name: 1, _id: 0})
+        .then(result => res.render('pages/personResult', result))
+        .catch(next)
+})
 app.use(function (err, req, res, next) {
     // set locals, only providing error in development
     res.locals.message = err.message;
@@ -72,32 +94,34 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('common/error', {title: 'Error'});
 });
-mongoose.connect('mongodb://localhost/books');
+mongoose.connect('mongodb://localhost/bookstore');
 const Schema = mongoose.Schema;
 const bookSchema = Schema({
     name: {
         type: String,
-        require: true,
+        required: true,
         unique: true,
         index: true
     },
     reader: [{
         type: Schema.Types.ObjectId,
-        ref: 'Book'
+        ref: 'Person'
     }]
 });
 const personSchema = Schema({
     name: {
         type: String,
-        require: true,
+        required: true,
         unique: true,
         index: true
     },
     books: [{
         type: Schema.Types.ObjectId,
-        ref: 'Person'
+        ref: 'Book'
     }]
 });
 const Book = mongoose.model('Book', bookSchema);
 const Person = mongoose.model('Person', personSchema);
 app.listen(3000);
+
+
